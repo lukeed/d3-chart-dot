@@ -137,11 +137,9 @@ pre code {
 }
 
 .half {
+	width: 50%;
 	float: left;
 	display: inline-block;
-	width: calc(50% - 16px);
-	border-left: 2px solid #039BE5;
-	padding-left: 14px;
 }
 
 .half h3 {
@@ -158,6 +156,9 @@ pre code {
 	margin-top: 0;
 	line-height: 1.6;
 	margin-bottom: 16px;
+	border-left: 2px solid #039BE5;
+	padding-left: 14px;
+	margin-left: 2px;
 }
 
 .half b,
