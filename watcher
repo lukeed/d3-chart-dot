@@ -7,23 +7,23 @@ const browserify = require('browserify');
 const watchify = require('watchify');
 
 bs.init({
-	server: 'example',
-	files: ['./example'],
+	server: 'docs',
+	files: ['./docs'],
 	watchOptions: {
 		ignoreInitial: true,
-		ignored: 'example/*.js'
+		ignored: 'docs/*.js'
 	},
 });
 
 const b = browserify({
-	entries: 'example/app.js',
+	entries: 'docs/app.js',
 	plugin: [watchify],
 	packageCache: {},
 	cache: {}
 });
 
 function bundle() {
-  b.bundle().pipe(write('example/demo.js'));
+  b.bundle().pipe(write('docs/demo.js'));
 }
 
 b.on('update', bundle);

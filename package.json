@@ -13,9 +13,9 @@
 		"node": ">=4"
 	},
 	"scripts": {
-		"build": "browserify example/app.js > example/demo.js",
+		"build": "browserify docs/app.js > docs/demo.js",
 		"prestart": "npm run build",
-		"start": "browser-sync start --server 'example' --files 'example' --port 4000",
+		"start": "browser-sync start --server 'docs' --files 'docs' --port 4000",
 		"test": "xo",
 		"watch": "node watcher"
 	},
@@ -38,7 +38,7 @@
 		"xo": "^0.16.0"
 	},
 	"xo": {
-    "ignores": ["example/demo.js"],
+    "ignores": ["docs/demo.js"],
     "envs": ["browser"]
 	}
 }
