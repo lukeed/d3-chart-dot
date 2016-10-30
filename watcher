@@ -24,9 +24,9 @@ const b = browserify({
 
 function bundle() {
   b.bundle().pipe(write('example/demo.js'));
-  bs.reload();
 }
 
 b.on('update', bundle);
+b.on('bundle', bs.reload);
 
 bundle();
