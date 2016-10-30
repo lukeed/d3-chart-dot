@@ -13,7 +13,7 @@
 		"node": ">=4"
 	},
 	"scripts": {
-		"build": "browserify docs/demo.js > docs/bundle.js",
+		"build": "browserify docs/demo.js -o docs/bundle.js -t [ babelify --presets [ es2015 ] ]",
 		"prestart": "npm run build",
 		"start": "browser-sync start --server 'docs' --files 'docs' --port 4000",
 		"test": "xo",
@@ -29,10 +29,13 @@
 		"chart"
 	],
 	"dependencies": {
-		"d3": "^4.3.0"
+		"d3": "^4.3.0",
+    "object-assign": "^4.1.0"
 	},
 	"devDependencies": {
-		"browser-sync": "^2.17.5",
+    "babelify": "^7.3.0",
+    "babel-preset-es2015": "^6.18.0",
+    "browser-sync": "^2.17.5",
 		"browserify": "^13.1.1",
 		"watchify": "^3.7.0",
 		"xo": "^0.16.0"

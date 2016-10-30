@@ -21,7 +21,7 @@ const b = browserify({
 	plugin: [watchify],
 	packageCache: {},
 	cache: {}
-});
+}).transform('babelify', {presets: ['es2015']});
 
 function bundle() {
   b.bundle().pipe(write('docs/bundle.js'));

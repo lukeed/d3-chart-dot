@@ -19,18 +19,20 @@ function init() {
 		var chart = new Chart(o);
 		chart.render($.gen(n));
 
-		return {c: chart, n: n};
+		return { c: chart, n: n };
 	});
 }
 
-function update () {
+function update() {
 	var o = plots[this.index];
-	(this.index > -1) && o.c.update($.gen(o.n));
+	this.index > -1 && o.c.update($.gen(o.n));
 };
 
 $.on(document, 'DOMContentLoaded', init);
 
 },{"../lib":4,"./help":2}],2:[function(require,module,exports){
+'use strict';
+
 var x = exports;
 var doc = document;
 
@@ -52,7 +54,7 @@ x.gen = function (num) {
 	var data = [];
 	for (var i = num; i; i--) {
 		data.push({
-			bin: new Date(Date.now() - (i * 3600000)),
+			bin: new Date(Date.now() - i * 3600000),
 			value: Math.random() * 5 | 0
 		});
 	}
@@ -61,9 +63,11 @@ x.gen = function (num) {
 
 x.slice = function (list) {
 	return [].slice.call(list);
-}
+};
 
 },{}],3:[function(require,module,exports){
+'use strict';
+
 /**
  * Default config.
  */
@@ -75,7 +79,7 @@ module.exports = {
 	// height of chart
 	height: 80,
 	// margin
-	margin: {top: 0, right: 40, bottom: 40, left: 40},
+	margin: { top: 0, right: 40, bottom: 40, left: 40 },
 	// axis enabled
 	axis: true,
 	// axis padding
@@ -97,211 +101,288 @@ module.exports = {
 	// color interpolation
 	colorInterpolate: 'interpolateHcl',
 	// mouseover callback for tooltips or value display
-	mouseover: function () {},
+	mouseover: function mouseover() {},
 	// mouseout callback for tooltips or value display
-	mouseout: function () {}
+	mouseout: function mouseout() {}
 };
 
 },{}],4:[function(require,module,exports){
 'use strict';
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var d3 = require('d3');
-var defs = require('./config');
+var assign = require('object-assign');
+var config = require('./config');
 
-function DotChart(opts) {
-	this.set(opts);
-	if (!this.axis) {
-		this.margin = {top: 0, right: 0, bottom: 0, left: 0};
+module.exports = function () {
+	function DotChart(opts) {
+		_classCallCheck(this, DotChart);
+
+		this.set(opts);
+		if (!this.axis) {
+			this.margin = { top: 0, right: 0, bottom: 0, left: 0 };
+		}
+		this.init();
 	}
-	this.init();
-}
-
-DotChart.prototype = {
-	/**
-	 * Set configuration options.
-	 */
-	set: function (config) {
-		Object.assign(this, defs, config);
-	},
 
 	/**
-	 * Get all dimensions, sans margin.
-	 */
-	dimensions: function () {
-		var w = this.width - this.margin.left - this.margin.right;
-		var h = this.height - this.margin.top - this.margin.bottom;
-		return [w, h];
-	},
+  * Set configuration options.
+  */
 
-	/**
-	 * Handle mouseover.
-	 */
-	onMouseOver: function () {
-		var dim = this.dimensions();
-		var width = dim[0] / this.data.length;
-		var m = d3.mouse(this.chart.node());
-		var x = this.x.invert(m[0]);
-		var i = this.xBisect(this.data, x, 1);
-		var data = this.data[i - 1];
-		this.mouseover(data);
-	},
 
-	/**
-	 * Handle mouseleave.
-	 */
-	onMouseLeave: function () {
-		this.mouseout();
-	},
-
-	/**
-	 * Initialize the chart.
-	 */
-	init: function () {
-		var { target, width, height, margin, axisPadding, tickSize } = this
-		var { color, colorInterpolate, size, axis } = this
-		var [w,h] = this.dimensions();
-
-		this.chart = d3.select(this.target)
-				.style('max-width', `${width}px`)
-				.style('padding-top', `${height / w * width}px`)
-			.append('svg')
-				.attr('viewBox', `0 0 ${width} ${height}`)
-			.append('g')
-				.attr('transform', `translate(${margin.left}, ${margin.top})`)
-				.on('mouseover', _ => this.onMouseOver())
-				.on('mouseleave', _ => this.onMouseLeave())
-
-		this.x = d3.scaleTime().range([0, w]);
-
-		this.z = d3.scaleLinear().range(size);
-
-		this.color = d3.scaleLinear()
-			.range(color)
-			.interpolate(d3[colorInterpolate]);
-
-		this.xAxis = d3.axisBottom()
-			.scale(this.x)
-			.ticks(5)
-			.tickPadding(8)
-			.tickSize(tickSize);
-
-		if (axis) {
-			this.chart.append('g')
-				.attr('class', 'x axis')
-				.attr('transform', `translate(0, ${h+axisPadding})`)
-				.call(this.xAxis);
+	_createClass(DotChart, [{
+		key: 'set',
+		value: function set(opts) {
+			assign(this, config, opts);
 		}
 
-		this.xBisect = d3.bisector(d => d.bin).left;
+		/**
+   * Get all dimensions, sans margin.
+   */
 
-		this.ease = d3.transition().ease(d3[this.ease]);
-	},
+	}, {
+		key: 'dimensions',
+		value: function dimensions() {
+			var width = this.width,
+			    margin = this.margin,
+			    height = this.height;
 
-	/**
-	 * Render axis.
-	 */
-	renderAxis: function (data, options) {
-		var { chart, x, xAxis, nice, ease } = this;
-
-		var xd = x.domain(d3.extent(data, d => d.bin));
-
-		if (nice) {
-			xd.nice();
+			var w = width - margin.left - margin.right;
+			var h = height - margin.top - margin.bottom;
+			return [w, h];
 		}
 
-		(options.animate ? chart.transition() : chart)
-			.select('.x.axis').call(xAxis);
-	},
+		/**
+   * Handle mouseover.
+   */
 
-	/**
-	 * Render dots.
-	 */
-	renderDots: function (data, options) {
-		var { chart, x, z, ease, size, color, type, barPadding } = this;
-		var [w, h] = this.dimensions();
+	}, {
+		key: 'onMouseOver',
+		value: function onMouseOver() {
+			var _dimensions = this.dimensions(),
+			    _dimensions2 = _slicedToArray(_dimensions, 2),
+			    w = _dimensions2[0],
+			    h = _dimensions2[1];
 
-		var width = w / data.length;
-
-		// domains
-		var zMax = d3.max(data, d => d.value);
-		z.domain([0, zMax]);
-		color.domain([0, zMax]);
-
-		// dots
-		var dot = chart.selectAll('.dot').data(data);
-		var dur = options.animate ? 300 : 0;
-
-		if (type == 'bar') {
-			var barWidth = (w / data.length) - barPadding;
-			if (barWidth < 0.5) throw new Error('DotChart is too small for the amount of data points provided');
-
-			dot.enter() // enter
-				.append('rect')
-					.attr('class', 'dot')
-					.style('fill', d => color(d.value))
-				.merge(dot) // update
-					.transition().duration(dur)
-						.attr('x', d => x(d.bin) + width / 2)
-						.attr('y', d => h / 2 - z(d.value) / 2)
-						.attr('height', d => z(d.value))
-						.attr('width', barWidth)
-						.style('fill', d => color(d.value));
-		} else {
-			dot.enter() // enter
-				.append('circle')
-					.attr('class', 'dot')
-					.style('fill', d => color(d.value))
-				.merge(dot) // update
-					.transition().duration(dur)
-						.attr('cx', d => x(d.bin) + width / 2)
-						.attr('cy', h / 2)
-						.attr('r', d => z(d.value))
-						.style('fill', d => color(d.value));
+			var width = w / this.data.length;
+			var m = d3.mouse(this.chart.node());
+			var x = this.x.invert(m[0]);
+			var i = this.xBisect(this.data, x, 1);
+			var data = this.data[i - 1];
+			this.mouseover(data);
 		}
 
-		// exit
-		dot.exit().remove();
+		/**
+   * Handle mouseleave.
+   */
 
-		// overlay
-		var overlay = chart.selectAll('.overlay').data(data);
+	}, {
+		key: 'onMouseLeave',
+		value: function onMouseLeave() {
+			this.mouseout();
+		}
 
-		// enter
-		overlay.enter()
-			.append('rect')
-				.attr('class', 'overlay')
-			.merge(overlay) // update
-				.attr('x', d => x(d.bin))
-				.attr('width', width)
-				.attr('height', h)
-				.style('fill', 'transparent');
+		/**
+   * Initialize the chart.
+   */
 
-		// exit
-		overlay.exit().remove()
-	},
+	}, {
+		key: 'init',
+		value: function init() {
+			var _this = this;
 
-	/**
-	 * Render the chart against the given `data` which has the shape:
-	 *
-	 *  [{ bin: Date, value: int }]
-	 *
-	 */
-	render: function (data, options = {}) {
-		this.data = data;
-		this.renderAxis(data, options);
-		this.renderDots(data, options);
-	},
+			var target = this.target,
+			    width = this.width,
+			    height = this.height,
+			    margin = this.margin,
+			    axisPadding = this.axisPadding,
+			    tickSize = this.tickSize;
+			var color = this.color,
+			    colorInterpolate = this.colorInterpolate,
+			    size = this.size,
+			    axis = this.axis;
 
-	/**
-	 * Update the chart against the given `data`.
-	 */
-	update: function (data) {
-		this.render(data, {animate: true});
-	}
-};
+			var _dimensions3 = this.dimensions(),
+			    _dimensions4 = _slicedToArray(_dimensions3, 2),
+			    w = _dimensions4[0],
+			    h = _dimensions4[1];
 
-module.exports = DotChart;
+			this.chart = d3.select(target).style('max-width', width + 'px').style('padding-top', height / w * width + 'px').append('svg').attr('viewBox', '0 0 ' + width + ' ' + height).append('g').attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')').on('mouseover', function (_) {
+				return _this.onMouseOver();
+			}).on('mouseleave', function (_) {
+				return _this.onMouseLeave();
+			});
 
-},{"./config":3,"d3":5}],5:[function(require,module,exports){
+			this.x = d3.scaleTime().range([0, w]);
+
+			this.z = d3.scaleLinear().range(size);
+
+			this.color = d3.scaleLinear().range(color).interpolate(d3[colorInterpolate]);
+
+			this.xAxis = d3.axisBottom().scale(this.x).ticks(5).tickPadding(8).tickSize(tickSize);
+
+			if (axis) {
+				this.chart.append('g').attr('class', 'x axis').attr('transform', 'translate(0, ' + (h + axisPadding) + ')').call(this.xAxis);
+			}
+
+			this.xBisect = d3.bisector(function (d) {
+				return d.bin;
+			}).left;
+
+			this.ease = d3.transition().ease(d3[this.ease]);
+		}
+
+		/**
+   * Render axis.
+   */
+
+	}, {
+		key: 'renderAxis',
+		value: function renderAxis(data, options) {
+			var chart = this.chart,
+			    x = this.x,
+			    xAxis = this.xAxis,
+			    nice = this.nice,
+			    ease = this.ease;
+
+
+			var xd = x.domain(d3.extent(data, function (d) {
+				return d.bin;
+			}));
+
+			if (nice) {
+				xd.nice();
+			}
+
+			(options.animate ? chart.transition() : chart).select('.x.axis').call(xAxis);
+		}
+
+		/**
+   * Render dots.
+   */
+
+	}, {
+		key: 'renderDots',
+		value: function renderDots(data, options) {
+			var chart = this.chart,
+			    x = this.x,
+			    z = this.z,
+			    ease = this.ease,
+			    size = this.size,
+			    color = this.color,
+			    type = this.type,
+			    barPadding = this.barPadding;
+
+			var _dimensions5 = this.dimensions(),
+			    _dimensions6 = _slicedToArray(_dimensions5, 2),
+			    w = _dimensions6[0],
+			    h = _dimensions6[1];
+
+			var width = w / data.length;
+
+			// domains
+			var zMax = d3.max(data, function (d) {
+				return d.value;
+			});
+			z.domain([0, zMax]);
+			color.domain([0, zMax]);
+
+			// dots
+			var dot = chart.selectAll('.dot').data(data);
+			var dur = options.animate ? 300 : 0;
+
+			if (type == 'bar') {
+				var barWidth = w / data.length - barPadding;
+				if (barWidth < 0.5) throw new Error('DotChart is too small for the amount of data points provided');
+
+				dot.enter() // enter
+				.append('rect').attr('class', 'dot').style('fill', function (d) {
+					return color(d.value);
+				}).merge(dot) // update
+				.transition().duration(dur).attr('x', function (d) {
+					return x(d.bin) + width / 2;
+				}).attr('y', function (d) {
+					return h / 2 - z(d.value) / 2;
+				}).attr('height', function (d) {
+					return z(d.value);
+				}).attr('width', barWidth).style('fill', function (d) {
+					return color(d.value);
+				});
+			} else {
+				dot.enter() // enter
+				.append('circle').attr('class', 'dot').style('fill', function (d) {
+					return color(d.value);
+				}).merge(dot) // update
+				.transition().duration(dur).attr('cx', function (d) {
+					return x(d.bin) + width / 2;
+				}).attr('cy', h / 2).attr('r', function (d) {
+					return z(d.value);
+				}).style('fill', function (d) {
+					return color(d.value);
+				});
+			}
+
+			// exit
+			dot.exit().remove();
+
+			// overlay
+			var overlay = chart.selectAll('.overlay').data(data);
+
+			// enter
+			overlay.enter().append('rect').attr('class', 'overlay').merge(overlay) // update
+			.attr('x', function (d) {
+				return x(d.bin);
+			}).attr('width', width).attr('height', h).style('fill', 'transparent');
+
+			// exit
+			overlay.exit().remove();
+		}
+
+		/**
+   * Render the chart against the given `data` which has the shape:
+   *
+   *  [{ bin: Date, value: int }]
+   *
+   */
+
+	}, {
+		key: 'render',
+		value: function render(data) {
+			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			this.data = data;
+			this.renderAxis(data, options);
+			this.renderDots(data, options);
+		}
+
+		/**
+   * Update the chart against the given `data`.
+   */
+
+	}, {
+		key: 'update',
+		value: function update(data) {
+			this.render(data, { animate: true });
+		}
+
+		/**
+   * Destroy the chart instance
+   */
+
+	}, {
+		key: 'destroy',
+		value: function destroy() {}
+	}]);
+
+	return DotChart;
+}();
+
+},{"./config":3,"d3":5,"object-assign":6}],5:[function(require,module,exports){
 // https://d3js.org Version 4.3.0. Copyright 2016 Mike Bostock.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -16685,5 +16766,90 @@ exports.geoTransverseMercatorRaw = transverseMercatorRaw;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+
+},{}],6:[function(require,module,exports){
+'use strict';
+/* eslint-disable no-unused-vars */
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (e) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
 
 },{}]},{},[1]);
