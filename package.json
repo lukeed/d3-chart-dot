@@ -14,7 +14,8 @@
 	},
 	"scripts": {
 		"build": "browserify docs/demo.js -o docs/bundle.js -t [ babelify --presets [ es2015 ] ]",
-		"prestart": "npm run build",
+    "minify": "npm run build && uglifyjs docs/bundle.js -cmo docs/bundle.js",
+		"prestart": "npm run minify",
 		"start": "browser-sync start --server 'docs' --files 'docs' --port 4000",
 		"test": "xo",
 		"watch": "node watcher"
@@ -37,6 +38,7 @@
 		"babelify": "^7.3.0",
 		"browser-sync": "^2.17.5",
 		"browserify": "^13.1.1",
+		"uglify-js": "^2.7.4",
 		"watchify": "^3.7.0",
 		"xo": "^0.16.0"
 	},
