@@ -1,6 +1,5 @@
 'use strict';
 
-var d3 = require('d3');
 var Chart = require('../lib');
 var $ = require('./help');
 
@@ -22,11 +21,11 @@ function init() {
 		target: '#c3',
 		margin: { top: 0, right: 40, bottom: 50, left: 40 },
 		width: 720,
-    axisPadding: 20,
-    barPadding: 1,
-    tickSize: 3,
-    size: [2, 30],
-    type: 'bar'
+		axisPadding: 20,
+		barPadding: 1,
+		tickSize: 3,
+		size: [2, 30],
+		type: 'bar'
 	});
 
 	c1.render($.gen(24));
