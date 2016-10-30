@@ -8,6 +8,7 @@ const watchify = require('watchify');
 
 bs.init({
 	server: 'docs',
+	reloadDelay: 300,
 	files: ['./docs'],
 	watchOptions: {
 		ignoreInitial: true,
