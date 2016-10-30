@@ -13,31 +13,42 @@ $ npm install --save d3-chart-dot
 ## Usage
 
 ```js
-const d3ChartDot = require('d3-chart-dot');
+const DotChart = require('d3-chart-dot');
 
-d3ChartDot('unicorns');
-//=> 'unicorns & rainbows'
+const chart = new DotChart({
+  target: '#chart',
+  width: 760,
+  mouseover: data => console.log('hovering:', data)
+});
 ```
 
 
 ## API
 
-### d3ChartDot(input, [options])
+### DotChart(options)
 
-#### input
+#### target
 
-Type: `string`
+Type: `string`<br>
+Default: `'#chart'`
 
-Lorem ipsum.
+The element selector.
 
-#### options
+## Development
 
-##### foo
+```bash
+# build assets & start a dev server
+npm run watch
 
-Type: `boolean`<br>
-Default: `false`
+# bundle module for development
+npm run build
 
-Lorem ipsum.
+# start a server on port 3000
+npm start
+
+# run code linter & optionally run tests
+npm test
+```
 
 
 ## License
