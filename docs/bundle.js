@@ -108,12 +108,10 @@ module.exports = {
 var d3 = require('d3');
 var defs = require('./config');
 
-var zeroMargin = {top: 0, right: 0, bottom: 0, left: 0};
-
 function DotChart(opts) {
 	this.set(opts);
 	if (!this.axis) {
-		this.margin = zeroMargin;
+		this.margin = {top: 0, right: 0, bottom: 0, left: 0};
 	}
 	this.init();
 }
