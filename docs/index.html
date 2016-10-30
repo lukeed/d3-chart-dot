@@ -37,21 +37,39 @@ chart.render([{x, y}, {x, y}, {x, y}]);</code></pre>
 			<h2 id="example-defaults">
 				Example: Defaults <small>Chart default settings</small>
 			</h2>
-			<div class="chart" id="c1"></div>
+			<div class="chart" id="c1" data-count="24" data-options='{}'></div>
 		</section>
 
 		<section>
 			<h2 id="example-small">
 				Example: Small <small>Chart with smaller size</small>
 			</h2>
-			<div class="chart" id="c2"></div>
+			<div class="chart" id="c2"
+				data-count="10"
+				data-options='{
+					"width": 200,
+					"height": 80,
+					"size": [2,4]
+				}'>
+			</div>
 		</section>
 
-		<section class="demo">
+		<section>
 			<h2 id="example-kitchen-sink">
 				Example: Kitchen Sink <small>Chart with most settings configured</small>
 			</h2>
-			<div id="c3" class="chart"></div>
+			<div id="c3" class="chart"
+				data-count="160"
+				data-options='{
+					"margin": {"top": 0, "right": 40, "bottom": 50, "left": 40},
+					"width": 720,
+					"axisPadding": 20,
+					"barPadding": 1,
+					"tickSize": 3,
+					"size": [2, 30],
+					"type": "bar"
+				}'>
+			</div>
 		</section>
 
 		<section>

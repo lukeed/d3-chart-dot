@@ -4,46 +4,36 @@
 var Chart = require('../lib');
 var $ = require('./help');
 
-var c1, c2, c3;
+var plots;
 
 function init() {
-	c1 = new Chart({
-		target: '#c1',
-	});
+	plots = $.cls('chart').map(function (el) {
+		var n = Number(el.getAttribute('data-count'));
+		var o = JSON.parse(el.getAttribute('data-options') || '{}');
+		o.target = '#' + el.id;
 
-	c2 = new Chart({
-		target: '#c2',
-		width: 200,
-		height: 80,
-		size: [2, 4]
-	});
+		var chart = new Chart(o);
+		chart.render($.gen(n));
 
-	c3 = new Chart({
-		target: '#c3',
-		margin: { top: 0, right: 40, bottom: 50, left: 40 },
-		width: 720,
-		axisPadding: 20,
-		barPadding: 1,
-		tickSize: 3,
-		size: [2, 30],
-		type: 'bar'
+		return {c: chart, n: n};
 	});
-
-	c1.render($.gen(24));
-	c2.render($.gen(10));
-	c3.render($.gen(100));
 }
 
 window.update = function () {
-	c1.update($.gen(24));
-	c2.update($.gen(10));
-	c3.update($.gen(150));
+	plots.forEach(function (o) {
+		o.c.update($.gen(o.n));
+	});
 };
 
 $.on(document, 'DOMContentLoaded', init);
 
 },{"../lib":4,"./help":2}],2:[function(require,module,exports){
 var x = exports;
+var doc = document;
+
+x.cls = function (sel, ctx) {
+	return this.slice((ctx || doc).getElementsByClassName(sel));
+};
 
 x.on = function (el, events, cb) {
 	events.split(' ').forEach(function (e) {
@@ -61,6 +51,10 @@ x.gen = function (num) {
 	}
 	return data;
 };
+
+x.slice = function (list) {
+	return [].slice.call(list);
+}
 
 },{}],3:[function(require,module,exports){
 /**
