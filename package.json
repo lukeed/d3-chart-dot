@@ -1,0 +1,43 @@
+{
+	"name": "d3-chart-dot",
+	"version": "0.0.0",
+	"description": "Dot chart with D3.js",
+	"license": "MIT",
+	"repository": "lukeed/d3-chart-dot",
+	"author": {
+		"name": "Luke Edwards",
+		"email": "luke.edwards05@gmail.com",
+		"url": "lukeed.com"
+	},
+	"engines": {
+		"node": ">=4"
+	},
+	"scripts": {
+		"build": "browserify example/app.js > example/demo.js",
+		"prestart": "npm run build",
+		"start": "browser-sync start --server 'example' --files 'example' --port 4000",
+		"test": "xo",
+		"watch": "node watcher"
+	},
+	"main": "lib/index.js",
+	"files": [
+		"lib"
+	],
+	"keywords": [
+		"d3",
+		"d3.js",
+		"chart"
+	],
+	"dependencies": {
+		"d3": "^4.3.0"
+	},
+	"devDependencies": {
+		"browser-sync": "^2.17.5",
+		"browserify": "^13.1.1",
+		"watchify": "^3.7.0",
+		"xo": "^0.16.0"
+	},
+	"xo": {
+		"esnext": true
+	}
+}

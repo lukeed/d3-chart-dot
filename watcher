@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+'use strict';
+
+const write = require('fs').createWriteStream;
+const bs = require('browser-sync').create();
+const browserify = require('browserify');
+const watchify = require('watchify');
+
+bs.init({
+	server: 'example',
+	files: ['./example'],
+	watchOptions: {
+		ignoreInitial: true,
+		ignored: 'example/*.js'
+	},
+});
+
+const b = browserify({
+	entries: 'example/app.js',
+	plugin: [watchify],
+	packageCache: {},
+	cache: {}
+});
+
+function bundle() {
+  b.bundle().pipe(write('example/demo.js'));
+  bs.reload();
+}
+
+b.on('update', bundle);
+
+bundle();
