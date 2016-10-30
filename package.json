@@ -13,7 +13,7 @@
 		"node": ">=4"
 	},
 	"scripts": {
-		"build": "browserify docs/app.js > docs/demo.js",
+		"build": "browserify docs/demo.js > docs/bundle.js",
 		"prestart": "npm run build",
 		"start": "browser-sync start --server 'docs' --files 'docs' --port 4000",
 		"test": "xo",
@@ -38,7 +38,7 @@
 		"xo": "^0.16.0"
 	},
 	"xo": {
-    "ignores": ["docs/demo.js"],
+    "ignores": ["docs/bundle.js"],
     "envs": ["browser"]
 	}
 }

@@ -16,14 +16,14 @@ bs.init({
 });
 
 const b = browserify({
-	entries: 'docs/app.js',
+	entries: 'docs/demo.js',
 	plugin: [watchify],
 	packageCache: {},
 	cache: {}
 });
 
 function bundle() {
-  b.bundle().pipe(write('docs/demo.js'));
+  b.bundle().pipe(write('docs/bundle.js'));
 }
 
 b.on('update', bundle);
