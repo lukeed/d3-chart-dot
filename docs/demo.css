@@ -208,7 +208,7 @@ footer {
 }
 
 @media screen and (max-width: 769px) {
-	.options .half {
+	.half {
 		float: none;
 		width: 100%;
 	}
