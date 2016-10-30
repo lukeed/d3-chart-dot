@@ -7,10 +7,14 @@ var $ = require('./help');
 var plots;
 
 function init() {
-	plots = $.cls('chart').map(function (el) {
+	plots = $.cls('chart').map(function (el, i) {
 		var n = Number(el.getAttribute('data-count'));
 		var o = JSON.parse(el.getAttribute('data-options') || '{}');
 		o.target = '#' + el.id;
+
+		var btn = $.qs('button', el.parentNode);
+		$.on(btn, 'click touch', update);
+		btn.index = i;
 
 		var chart = new Chart(o);
 		chart.render($.gen(n));
@@ -19,10 +23,9 @@ function init() {
 	});
 }
 
-window.update = function () {
-	plots.forEach(function (o) {
-		o.c.update($.gen(o.n));
-	});
+function update () {
+	var o = plots[this.index];
+	(this.index > -1) && o.c.update($.gen(o.n));
 };
 
 $.on(document, 'DOMContentLoaded', init);
@@ -33,6 +36,10 @@ var doc = document;
 
 x.cls = function (sel, ctx) {
 	return this.slice((ctx || doc).getElementsByClassName(sel));
+};
+
+x.qs = function (sel, ctx) {
+	return (ctx || doc).querySelector(sel);
 };
 
 x.on = function (el, events, cb) {
